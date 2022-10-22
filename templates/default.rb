@@ -1,26 +1,17 @@
-############################################
-
 class Solution
-    def solution1(data: "")
+    def initialize(data = "")
+        @data = data
+    end
+
+    def solution1
         puts "========================"
         puts "Solution #1: #{nil}"
         puts "========================"
     end
 
-    def solution2(data: "")
+    def solution2
         puts "========================"
-        puts "Solution #1: #{nil}"
+        puts "Solution #2: #{nil}"
         puts "========================"
     end
 end
-
-############################################
-
-# Reading args
-solutionNumber, *args = ARGV
-
-# Reading input
-data = File.read("input.txt")
-
-# Running solution
-Solution.new.public_send("solution#{solutionNumber}")

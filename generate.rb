@@ -13,16 +13,16 @@ if !Dir.exist?(folder)
 end
 
 # Adding new solution default template
-srcFile = "templates/default.rb"
-destFile = "#{folder}/script.rb"
-if !File.exist?(destFile)
-    puts "Creating new default template: #{destFile}"
-    FileUtils.cp(srcFile, destFile)
+src_file = "templates/default.rb"
+dest_file = "#{folder}/solution.rb"
+if !File.exist?(dest_file)
+    puts "Creating new default template: #{dest_file}"
+    FileUtils.cp(src_file, dest_file)
 end
 
 # Adding new solution input file
-inputFile = "#{folder}/input.txt";
-if !File.exist?(inputFile)
-    puts "Creating new empty input file: #{inputFile}"
-    FileUtils.touch(inputFile)
+input_file = "#{folder}/input.txt";
+if !File.exist?(input_file)
+    puts "Creating new empty input file: #{input_file}"
+    FileUtils.touch(input_file)
 end
