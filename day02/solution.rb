@@ -37,8 +37,7 @@ class Solution
     end
 
     ###################################
-    private
-    ###################################
+
     @@key = { up: "U", right: "R", down: "D", left: "L" }
 
     # Normal keypad 1-9

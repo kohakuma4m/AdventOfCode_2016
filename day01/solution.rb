@@ -49,8 +49,6 @@ class Solution
     end
 
     ###################################
-    private
-    ###################################
 
     @@direction = { north: "North", east: "East", south: "South", west: "West" }
     @@direction_map = {

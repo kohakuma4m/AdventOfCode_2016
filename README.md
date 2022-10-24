@@ -1,4 +1,4 @@
-# Advent of Code 2015 solutions (ruby 3.1.2)
+# Advent of Code 2016 solutions (ruby 3.1.2)
 - https://adventofcode.com/2016
 
 # To create new day solution, run
