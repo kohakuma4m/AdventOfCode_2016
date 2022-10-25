@@ -11,11 +11,11 @@ Dir.chdir("#{folder}") do
     data = File.read("input.txt")
 
     # Running solution
-    solution = Solution.new(data)
-    solution_method = "solution#{solution_number}"
-    if solution.respond_to?(solution_method)
-        puts Benchmark.realtime {
+    puts Benchmark.realtime {
+        solution = Solution.new(data)
+        solution_method = "solution#{solution_number}"
+        if solution.respond_to?(solution_method)
             solution.public_send(solution_method)
-        }
-    end
+        end
+    }
 end
