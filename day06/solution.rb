@@ -6,11 +6,7 @@ class Solution
     def solution1
         # Join most common letter at each position
         message = @lines.transpose.flatten.each_slice(@lines.length)
-            .map { |position_chars|
-                char_counts = Hash.new(0)
-                position_chars.each { |c| char_counts[c] += 1 }
-                char_counts.max_by{ |key, value| value }
-            }
+            .map { |position_chars| position_chars.tally({}).max_by { |key, value| value } }
             .map { |key, value| key }
             .join("")
 
@@ -22,11 +18,7 @@ class Solution
     def solution2
         # Join least common letter at each position
         message = @lines.transpose.flatten.each_slice(@lines.length)
-            .map { |position_chars|
-                char_counts = Hash.new(0)
-                position_chars.each { |c| char_counts[c] += 1 }
-                char_counts.min_by{ |key, value| value }
-            }
+            .map { |position_chars| position_chars.tally({}).min_by { |key, value| value } }
             .map { |key, value| key }
             .join("")
 
