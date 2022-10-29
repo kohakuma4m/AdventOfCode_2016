@@ -31,6 +31,7 @@ class Solution
     LIGHTS = { on: "#", off: "." }
 
     Operation = Struct.new(:instruction, :value1, :value2)
+
     INSTRUCTIONS_REGEX = /(rect|rotate row|rotate column) (?:(\d+)x(\d+)|[xy]=(\d+) by (\d+))/
 
     def read_instructions(data)
