@@ -2,12 +2,12 @@ require_relative '../lib/grid'
 
 class Solution
     def initialize(data = "")
-        @operations = self.read_instructions(data)
+        @operations = read_instructions(data)
     end
 
     def solution1
         grid = Grid.new(50, 6, LIGHTS[:off])
-        self.fill_grid(grid)
+        fill_grid(grid)
 
         nb_lights = grid.data.sum(0) { |row| row.sum(0) { |s| (s == LIGHTS[:on] ? 1 : 0) } }
 
@@ -18,7 +18,7 @@ class Solution
 
     def solution2
         grid = Grid.new(50, 6, LIGHTS[:off])
-        self.fill_grid(grid)
+        fill_grid(grid)
 
         puts "========================"
         puts "Solution #2:"

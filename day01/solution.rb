@@ -32,7 +32,7 @@ class Solution
         visited_positions = Set[position]
         @instructions.each do |s|
             direction = @@direction_map[direction][s[0]]
-            position, is_already_visited_position = self.moveToNextPosition(position, direction, Integer(s[1..]), visited_positions)
+            position, is_already_visited_position = moveToNextPosition(position, direction, Integer(s[1..]), visited_positions)
             if is_already_visited_position
                 break
             end

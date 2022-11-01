@@ -4,7 +4,7 @@ class Solution
     end
 
     def solution1
-        data = self.decompress_data(@data)
+        data = decompress_data(@data)
 
         puts "========================"
         puts "Compression: #{(100.0 * @data.length / data.length).round(6)}%"
@@ -14,8 +14,8 @@ class Solution
     end
 
     def solution2
-        #length = self.get_decompressed_data_length_old(@data)
-        length = self.get_decompressed_data_length(@data)
+        #length = get_decompressed_data_length_old(@data)
+        length = get_decompressed_data_length(@data)
 
         puts "========================"
         puts "Compression: #{(100.0 * @data.length / length).round(6)}%"

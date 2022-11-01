@@ -1,4 +1,9 @@
+require 'digest'
+
 class Grid
+
+    # Getters & setters
+    attr_reader(:width, :height, :data)
 
     # Constructor
     def initialize(width, height, value = 0)
@@ -7,8 +12,32 @@ class Grid
         @data = Array.new(height) { Array.new(width) { value } }
     end
 
-    # Getters & setters
-    attr_reader(:width, :height, :data)
+    # Deep copy method for "dup"
+    def initialize_copy(original)
+        @width = original.width
+        @height = original.height
+        @data = original.data.map { |row| row.map { |col| col } }
+    end
+
+    # Comparison function
+    def hash
+        @data.hash
+    end
+    def eql?(other) # Called only when hash is different
+        if self.width != other.width || self.height != other.height
+            return false
+        end
+
+        self.height.times { |y|
+            self.width.times { |x|
+                if self.data[y][x] != other.data[y][x]
+                    return false
+                end
+            }
+        }
+
+        return true
+    end
 
     # Methods
     def print(horizontal_separator: "-", vertical_separator: "|")
@@ -16,7 +45,7 @@ class Grid
 
         puts border
         @data.each do |row|
-            puts "#{vertical_separator}#{row.join("")}#{vertical_separator}"
+            puts "#{vertical_separator.ljust(horizontal_separator.length)}#{row.join("")}#{vertical_separator.rjust(horizontal_separator.length)}"
         end
         puts border
     end

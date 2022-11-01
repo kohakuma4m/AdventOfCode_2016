@@ -43,19 +43,19 @@ class Solution
 
     Output = Struct.new(:id, :type) {
         def to_s
-            return "#{self.type} ##{self.id}"
+            return "#{type} ##{id}"
         end
     }
 
     Bot = Struct.new(:id, :values, :processed_values, :low_output, :high_output) {
         def to_s
-            return "bot ##{self.id}, values: #{self.values}, processed values: #{self.processed_values.to_a}, low --> #{self.low_output}, high --> #{self.high_output}"
+            return "bot ##{id}, values: #{values}, processed values: #{processed_values.to_a}, low --> #{low_output}, high --> #{high_output}"
         end
     }
 
     Bin = Struct.new(:id, :values) {
         def to_s
-            return "output bin ##{self.id}, values: #{self.values}"
+            return "output bin ##{id}, values: #{values}"
         end
     }
 
