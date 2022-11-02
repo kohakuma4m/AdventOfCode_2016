@@ -49,6 +49,11 @@ class Solution
         microchip: "M"
     }
 
+    DIRECTIONS = {
+        up: "UP",
+        down: "DOWN"
+    }
+
     Item = Struct.new(:key, :floor, :position) {
         def element
             key[0]
@@ -108,32 +113,55 @@ class Solution
         return is_safe_floor?(current_floor_items) && is_safe_floor?(target_floor_items)
     end
 
-    def find_safe_moves(facility, target_floor: 4)
+    def find_best_safe_moves(facility, target_floor: 4)
         # Floor items to move (exluding matching items already on target floor)
         floor_items = facility.get_floor_items(facility.current_floor, exclude_matching_items: facility.current_floor == target_floor)
         # Target floors (excluding empty floors below current floor)
         reachable_floors = facility.get_reachable_floors(exclude_lower_empty_floors: false) # Should always be false to avoid missing solution...
+        # Target direction: Up or down toward target floor
+        target_direction = facility.current_floor <= target_floor ? DIRECTIONS[:up] : DIRECTIONS[:down]
+
+        # Optimisation 2) Excluding items from duplicate item pairs, since moving items from any pair is symmetrical
+        items_to_move = floor_items
+        matching_items = floor_items.select { |i| floor_items.find { |i2| i2.key != i.key && i2.element == i.element } }
+        if matching_items.length > 2
+            # Keeping only first matching pair, as any matching pair of items is the same
+            first_matching_items = [matching_items[0], matching_items.find { |i2| i2.key != matching_items[0].key && i2.element == matching_items[0].element }]
+            duplicate_items = matching_items.select { |i| !first_matching_items.find { |i2| i2.key == i.key } }
+            items_to_move = floor_items.select { |i| !duplicate_items.find { |i2| i2.key == i.key } }
+        end
 
         moves = []
-        reachable_floors.each { |floor|
+        reachable_floors.each do |floor|
+            direction = facility.current_floor < floor ? DIRECTIONS[:up] : DIRECTIONS[:down]
             target_floor_items = facility.get_floor_items(floor, exclude_matching_items: true)
 
-            # Moving two items
-            floor_items.combination(2).select { |(i1, i2)| is_safe_move?(floor_items, target_floor_items, [i1, i2]) }
-                .each { |(i1, i2)| moves.push(Move.new([i1, i2], floor)) }
+            # Optimisation 1a) Moving as many items as possible toward target floor, or as few item as possible away from target floor
+            combinations = items_to_move.combination(direction == target_direction ? 2 : 1).select { |items| is_safe_move?(floor_items, target_floor_items, items) }
+            combinations.each { |items| moves.push(Move.new(items, floor)) }
 
-            # Moving one item
-            floor_items.select { |i| is_safe_move?(floor_items, target_floor_items, [i]) }
-                .each { |i| moves.push(Move.new([i], floor)) }
-        }
+            if combinations.length == 0
+                # Optimisation 1b) Moving less items toward target floor, or more item away from target floor only if there is no other possible move
+                items_to_move.combination(direction == target_direction ? 1: 2).select { |items| is_safe_move?(floor_items, target_floor_items, items) }
+                    .each { |items| moves.push(Move.new(items, floor)) }
+            end
+        end
 
         return moves
     end
 
     ##
-    # Exploring all new states of increasing number of moves until a solution is found
+    # Exploring all new unique facility states of increasing number of moves until a solution is found`
     #
-    # Note: State is the facility grid, but could be optimized to be only floor position of elevator and all items
+    #   Runtime: About 30s (part1) and more than 70 minutes (part 2)
+    #
+    # Optimisation #1: Excluding less optimal moves that needlessly increase move counts
+    #
+    #   Runtime: Less than 8s (part1), and more than 16 minutes (part 2)
+    #
+    # Optimisation #2: Excluding moves from duplicate pairs of matching items, since moving items from any pair is symmetrical
+    #
+    #   Runtime: Less than 2s (part1), and less than 1 minute (part 2)
     ##
     def find_solution(facility, target_floor: 4)
         visited_states = Set.new()
@@ -146,7 +174,8 @@ class Solution
             puts "#{solutions.map { |s| s.moves.length }.uniq}: #{solutions.length}"
 
             solutions.each do |s|
-                find_safe_moves(s.facility, target_floor: target_floor)
+                # Finding only safe moves which goes fastest toward target floor
+                find_best_safe_moves(s.facility, target_floor: target_floor)
                     .each { |m|
                         new_facility = s.facility.dup
                         new_facility.move_items_with_elevator(m.items, m.floor)
