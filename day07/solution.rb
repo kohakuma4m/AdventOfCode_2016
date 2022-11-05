@@ -1,4 +1,5 @@
 class Solution
+
     def initialize(data = "")
         @ip_addresses = data.split("\n")
     end

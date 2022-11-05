@@ -1,4 +1,5 @@
 class Solution
+
     def initialize(data = "")
         @lines = data.split("\n").map { |l| l.split("") }
     end
@@ -26,4 +27,5 @@ class Solution
         puts "Solution #2: #{message}"
         puts "========================"
     end
+
 end

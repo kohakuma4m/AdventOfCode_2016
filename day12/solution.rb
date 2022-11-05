@@ -1,4 +1,5 @@
 class Solution
+
     def initialize(data = "")
         @instructions = read_instructions(data.split("\n"))
     end
@@ -82,4 +83,5 @@ class Solution
 
         return registers
     end
+
 end

@@ -1,6 +1,7 @@
 require_relative "../lib/grid"
 
 class Solution
+
     def initialize(data = "")
         @operations = read_instructions(data)
     end
@@ -57,4 +58,5 @@ class Solution
             end
         end
     end
+
 end

@@ -1,6 +1,7 @@
 require "digest"
 
 class Solution
+
     def initialize(data = "")
         @salt = data
     end

@@ -1,4 +1,5 @@
 class Solution
+
     def initialize(data = "")
         @data = data
     end
@@ -14,4 +15,7 @@ class Solution
         puts "Solution #2: #{nil}"
         puts "========================"
     end
+
+    ###################################
+
 end

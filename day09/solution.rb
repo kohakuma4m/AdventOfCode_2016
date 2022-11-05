@@ -1,4 +1,5 @@
 class Solution
+
     def initialize(data = "")
         @data = data
     end
@@ -155,4 +156,5 @@ class Solution
 
         return weights.sum
     end
+
 end

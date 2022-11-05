@@ -1,6 +1,7 @@
 require "set"
 
 class Solution
+
     def initialize(data = "")
         @data = data
     end
@@ -139,4 +140,5 @@ class Solution
             end
         end
     end
+
 end

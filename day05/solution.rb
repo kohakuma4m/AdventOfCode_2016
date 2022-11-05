@@ -1,6 +1,7 @@
 require "digest"
 
 class Solution
+
     def initialize(data = "")
         @door_id = data
     end
@@ -49,4 +50,5 @@ class Solution
         puts "Solution #2: #{password}"
         puts "========================"
     end
+
 end

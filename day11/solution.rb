@@ -2,6 +2,7 @@ require "set"
 require_relative "../lib/grid"
 
 class Solution
+
     def initialize(data = "")
         @data = data
     end
