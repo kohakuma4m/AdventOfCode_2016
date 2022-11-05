@@ -1,5 +1,3 @@
-require "digest"
-
 class Grid
 
     # Getters & setters

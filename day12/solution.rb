@@ -19,7 +19,7 @@ class Solution
         puts "========================"
         puts registers
         puts "========================"
-        puts "Solution #1: #{registers["a"]}"
+        puts "Solution #2: #{registers["a"]}"
         puts "========================"
     end
 
