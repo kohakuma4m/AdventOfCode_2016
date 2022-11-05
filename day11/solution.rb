@@ -1,5 +1,5 @@
-require 'set'
-require_relative '../lib/grid'
+require "set"
+require_relative "../lib/grid"
 
 class Solution
     def initialize(data = "")
@@ -164,7 +164,7 @@ class Solution
     #   Runtime: Less than 2s (part1), and less than 1 minute (part 2)
     ##
     def find_solution(facility, target_floor: 4)
-        visited_states = Set.new()
+        visited_states = Set.new([facility])
         solutions_to_process = [Solution.new(facility, [])]
 
         loop do
@@ -180,19 +180,19 @@ class Solution
                         new_facility = s.facility.dup
                         new_facility.move_items_with_elevator(m.items, m.floor)
 
-                        if(visited_states.add?(new_facility))
+                        if visited_states.add?(new_facility)
                             # New unvisited state
                             solutions_to_process.push(Solution.new(new_facility, s.moves.dup.push(m)))
 
                             if new_facility.get_floor_items(target_floor).length === facility.items.length
-                                return solutions_to_process[-1]
+                                return solutions_to_process[-1] # Solution found
                             end
                         end
                     }
             end
 
             if solutions_to_process.length == 0
-                return nil
+                return nil # No solution was found !
             end
         end
     end

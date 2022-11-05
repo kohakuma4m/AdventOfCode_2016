@@ -1,4 +1,4 @@
-require 'set'
+require "set"
 
 class Solution
     def initialize(data = "")
