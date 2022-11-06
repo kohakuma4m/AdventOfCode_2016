@@ -1,12 +1,13 @@
 require "set"
 require "colorize"
+require_relative "../lib/coordinate"
 require_relative "../lib/grid"
 
 class Solution
 
     def initialize(data = "")
         @input = Integer(data)
-        @target = Coordinate.new(31, 39)
+        @target = Location.new(31, 39)
         @target_length = 51
     end
 
@@ -43,21 +44,10 @@ class Solution
         unknown: " ".black
     }
 
-    class Coordinate
-        attr_reader :x, :y, :key
+    class Location < Coordinate
 
         def initialize(*args)
-            if args.length == 2 && args[0].is_a?(Integer) && args[1].is_a?(Integer)
-                @x = args[0]
-                @y = args[1]
-                @key = "#{@x}-#{@y}"
-            elsif args.length == 1 && args[0]
-                @key = args[0]
-                @x, @y = @key.split("-").map { |n| Integer(n) }
-            else
-                raise ArgumentError.new("Coordinate construtor: #{args} does not match (x, y) or (key) signature")
-            end
-
+            super(*args)
             @value = @x*@x + 3*@x + 2*@x*@y + @y + @y*@y
         end
 
@@ -65,16 +55,6 @@ class Solution
             (@value + n).to_s(2).count("1") % 2 == 0
         end
 
-        def to_s
-            "Coordinate (#{@x}-#{y})"
-        end
-
-        def hash
-            @key.hash
-        end
-        def eql?(other)
-            return self.key == other.key
-        end
     end
 
     class Path
@@ -93,7 +73,7 @@ class Solution
     class Maze
         attr_reader :n, :start, :locations
 
-        def initialize(n, start = Coordinate.new(1, 1))
+        def initialize(n, start = Location.new(1, 1))
             @n = n
             @start = start
             @locations_map = { start.key => start }
@@ -107,36 +87,32 @@ class Solution
 
             max_y.times { |y|
                 max_x.times { |x|
-                    c = @locations_map["#{x}-#{y}"]
-                    if c
-                        grid.data[y][x] = c.is_open?(@n) ? (locations.include?(c) ? SYMBOLS[:visited] : SYMBOLS[:open]) : SYMBOLS[:wall]
+                    l = @locations_map["#{x}-#{y}"]
+                    if l
+                        grid.data[y][x] = l.is_open?(@n) ? (locations.include?(l) ? SYMBOLS[:visited] : SYMBOLS[:open]) : SYMBOLS[:wall]
                     end
                 }
             }
 
             paths.each { |p|
-                p.steps.each { |c|
-                    grid.data[c.y][c.x] = SYMBOLS[:path]
+                p.steps.each { |l|
+                    grid.data[l.y][l.x] = SYMBOLS[:path]
                 }
             }
 
             grid.print
         end
 
-        def reveal_next_locations(c)
-            adjacent_keys = ["#{c.x + 1}-#{c.y}", "#{c.x}-#{c.y + 1}"]
-            if c.x > 0
-                adjacent_keys.push("#{c.x - 1}-#{c.y}")
-            end
-            if c.y > 0
-                adjacent_keys.push("#{c.x}-#{c.y - 1}")
-            end
+        def reveal_next_locations(l)
+            adjacent_keys = ["#{l.x + 1}-#{l.y}", "#{l.x}-#{l.y + 1}"]
+            adjacent_keys.push("#{l.x - 1}-#{l.y}") if l.x > 0
+            adjacent_keys.push("#{l.x}-#{l.y - 1}") if l.y > 0
 
             adjacent_locations = []
             adjacent_keys.each do |key|
                 if !@locations_map[key]
                     # Adding new location
-                    @locations_map[key] = Coordinate.new(key)
+                    @locations_map[key] = Location.new(key)
                 end
                 adjacent_locations.push(@locations_map[key])
             end
@@ -152,7 +128,7 @@ class Solution
                 max_x.times { |x|
                     key = "#{x}-#{y}"
                     if !@locations_map[key]
-                        @locations_map[key] = Coordinate.new(key)
+                        @locations_map[key] = Location.new(key)
                     end
                 }
             }
@@ -179,11 +155,11 @@ class Solution
                 paths.each do |p|
                     current_location = p.steps[-1]
                     reveal_next_locations(current_location)
-                        .each { |c|
-                            if explored_locations.add?(c)
-                                new_path = Path.new(p.steps + [c])
+                        .each { |l|
+                            if explored_locations.add?(l)
+                                new_path = Path.new(p.steps + [l])
 
-                                if c.key == target.key
+                                if l.key == target.key
                                     return [
                                         new_path, # First found shortest path
                                         explored_locations # All visited locations
@@ -221,9 +197,9 @@ class Solution
                 paths.each do |p|
                     current_location = p.steps[-1]
                     reveal_next_locations(current_location)
-                        .each { |c|
-                            if explored_locations.add?(c)
-                                new_path = Path.new(p.steps + [c])
+                        .each { |l|
+                            if explored_locations.add?(l)
+                                new_path = Path.new(p.steps + [l])
                                 paths_to_explore.push(new_path) # New unexplored path
                             end
                         }

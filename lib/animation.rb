@@ -5,21 +5,27 @@ class Animation
     # Constructor
     def initialize(frames = [], width: nil, height: nil)
         @frames = frames
-        @width = width || frames[0]&.[0]&.length || 0
+        @width = width || frames[0]&.first.length || 0
         @height = height || frames[0]&.length || 0
     end
 
-    def play(speed: 60)
-        refresh_delay = 1.0 / frame_speed # frames / second
+    # Methods
+    def play(frame_per_second: 60)
+        refresh_delay = 1.0 / frame_per_second
 
-        i = 1
+        i = 0
         until i == @frames.length
             # Clearing previous frame
             print "\r" + ("\e[A\e[K" * (@height + 2)) if i > 0
 
             # Showing frame of data
-            frame = Grid.new(@width, @height, @frames[i - 1])
-            frame.print
+            frame = Grid.new(@width, @height)
+            @height.times { |y|
+                @width.times { |x|
+                    frame.data[y][x] = @frames[i][y][x]
+                }
+            }
+            frame.print(horizontal_separator: " ", vertical_separator: " ")
 
             if i == @frames.length
                 break # Leaving last frame visible

@@ -1,7 +1,7 @@
 class Grid
 
     # Getters & setters
-    attr_reader(:width, :height, :data)
+    attr_reader :width, :height, :data
 
     # Constructor
     def initialize(width, height, value = 0)
