@@ -82,7 +82,7 @@ class Solution
     ##
     # Only counts safe tiles without generating all room tiles (using uncolorized values only)
     #
-    # Note: Slower than using full algorithm above somehow (maybe because of grid data pre-allocation or non string manipulation ???)
+    # Note: Slower than using full algorithm above somehow (maybe because of grid data pre-allocation ???)
     ##
     def count_safe_tiles(first_row, nb_rows: 0)
         nb_safe_tiles = first_row.count(SAFE_TILE)
