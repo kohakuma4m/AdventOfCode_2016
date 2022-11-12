@@ -36,17 +36,17 @@ class CircularLinkedList
 
     # Add item after current node
     def add_next(item)
-        node = Node.new(item)
+        new_node = Node.new(item)
 
         if @length == 0
             # First node
-            node.next = node
-            @current = node
+            new_node.next = new_node
+            @current = new_node
             @head = @current
         else
             # Next node
-            node.next = @current.next
-            @current.next = node
+            new_node.next = @current.next
+            @current.next = new_node
         end
 
         @length += 1
@@ -54,23 +54,23 @@ class CircularLinkedList
 
     # Remove item after current node
     def remove_next()
-        node = nil
+        removed_node = nil
 
         if @length < 2
             # Last node or empty list
-            node = @current
+            removed_node = @current
             @head = nil
             @current = nil
         else
             # Next node
-            node = @current.next
-            @head = node.next if @current.next == @head # Head is now the second item
-            @current.next = node.next
+            removed_node = @current.next
+            @head = removed_node.next if @current.next == @head # Head is now the second item
+            @current.next = removed_node.next
         end
 
         @length -= 1 unless @length == 0
 
-        return node&.item # Returning removed item
+        return removed_node&.item # Returning removed item
     end
 
     # Remove all items from list
@@ -89,13 +89,18 @@ class CircularLinkedList
         end
     end
 
-    # Map & Block iterator to loop through circular list once, starting at head or current
-    def map(start_from_head: true)
+    # Update current item
+    def set_current(item)
+        @current.item = item if @length > 0
+    end
+
+    # Map & Block iterator to loop through circular list once, starting at current or head
+    def map(from_current: false)
         return [] if @length == 0
 
         list = []
 
-        start = start_from_head ? @head : @current
+        start = from_current ? @current : @head
         node = start
         loop do
             list << (block_given? ? yield(node&.item) : node&.item) # So we can chain with enumerable methods if needed
