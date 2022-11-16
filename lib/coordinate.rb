@@ -17,14 +17,23 @@ class Coordinate
         end
     end
 
+    # Deep copy method for "dup"
+    def initialize_copy(original)
+        @x = original.x
+        @y = original.y
+        @key = original.key
+    end
+
+    # Comparison function
+    def hash
+        @key.hash
+    end
+    def eql?(other) # Called only when hash is different
+        return self.key == other.key
+    end
+
     def to_s
         "Coordinate (#{@x}-#{y})"
     end
 
-    def hash
-        @key.hash
-    end
-    def eql?(other)
-        return self.key == other.key
-    end
 end

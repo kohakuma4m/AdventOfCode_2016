@@ -43,7 +43,8 @@ class Solution
     end
 
     def is_valid_key?(idx, hashes)
-        raise ArgumentError("Not enough following hashes to check if key is valid") if hashes.length < idx + 1001
+        raise ArgumentError.new("Not enough following hashes to check if key is valid") if hashes.length < idx + 1001
+
         key_to_validate = hashes[idx]
         repeated_char = key_to_validate.match(KEY_REGEX)&.captures
         if !repeated_char
