@@ -8,7 +8,7 @@ class Solution
 
     def solution1
         position = [0, 0]
-        direction = @@direction[:north]
+        direction = :north
 
         @instructions.each do |s|
             direction = @@direction_map[direction][s[0]]
@@ -27,7 +27,7 @@ class Solution
 
     def solution2
         position = [0, 0]
-        direction = @@direction[:north]
+        direction = :north
 
         visited_positions = Set[position]
         @instructions.each do |s|
@@ -50,18 +50,17 @@ class Solution
 
     ###################################
 
-    @@direction = { north: "North", east: "East", south: "South", west: "West" }
     @@direction_map = {
-        @@direction[:north] => { "R" => @@direction[:east], "L" => @@direction[:west] },
-        @@direction[:east] => { "R" => @@direction[:south], "L" => @@direction[:north] },
-        @@direction[:south] => { "R" => @@direction[:west], "L" => @@direction[:east] },
-        @@direction[:west] => { "R" => @@direction[:north], "L" => @@direction[:south] }
+        :north => { "R" => :east, "L" => :west },
+        :east => { "R" => :south, "L" => :north },
+        :south => { "R" => :west, "L" => :east },
+        :west => { "R" => :north, "L" => :south }
     }
     @@next_position_map = {
-        @@direction[:north] => lambda { |x, y, nb_steps| [x, y + nb_steps] },
-        @@direction[:east] => lambda { |x, y, nb_steps| [x + nb_steps, y] },
-        @@direction[:south] => lambda { |x, y, nb_steps| [x, y - nb_steps] },
-        @@direction[:west] => lambda { |x, y, nb_steps| [x - nb_steps, y] }
+        :north => lambda { |x, y, nb_steps| [x, y + nb_steps] },
+        :east => lambda { |x, y, nb_steps| [x + nb_steps, y] },
+        :south => lambda { |x, y, nb_steps| [x, y - nb_steps] },
+        :west => lambda { |x, y, nb_steps| [x - nb_steps, y] }
     }
 
     def moveToNextPosition(position, direction, nb_steps, visited_positions)

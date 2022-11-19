@@ -28,22 +28,23 @@ class Solution
 
     Instruction = Struct.new(:type, :param1, :param2)
 
-    @@instruction_type = { copy: "cpy", increase: "inc", decrease: "dec", jump: "jnz" }
+    @@instruction_type = { "cpy" => :copy, "inc" => :increase, "dec" => :decrease, "jnz" => :jump }
 
     def read_instructions(lines)
         return lines.map { |line|
             name, param1, param2 = line.split(" ")
+            type = @@instruction_type[name]
 
-            case name
-                when @@instruction_type[:copy]
+            case type
+                when :copy
                     value = param1.match(/[a-z]/) ? param1 : Integer(param1)
-                    Instruction.new(name, value, param2) # param1 is a register or a number, param2 is a register
-                when @@instruction_type[:increase], @@instruction_type[:decrease]
-                    Instruction.new(name, param1) # param1 is a register, param2 is undefined
-                when @@instruction_type[:jump]
+                    Instruction.new(type, value, param2) # param1 is a register or a number, param2 is a register
+                when :increase, :decrease
+                    Instruction.new(type, param1) # param1 is a register, param2 is undefined
+                when :jump
                     value1 = param1.match(/[a-z]/) ? param1 : Integer(param1)
                     value2 = param2.match(/[a-z]/) ? param2 : Integer(param2)
-                    Instruction.new(name, value1, value2) # param1 and param2 can both be a register or a number
+                    Instruction.new(type, value1, value2) # param1 and param2 can both be a register or a number
             end
         }
     end
@@ -64,14 +65,14 @@ class Solution
             instruction = instructions[idx]
 
             case instruction.type
-                when @@instruction_type[:copy]
+                when :copy
                     # Copy value from source register or initial value
                     registers[instruction.param2] = registers[instruction.param1] || instruction.param1
-                when @@instruction_type[:increase]
+                when :increase
                     registers[instruction.param1] += 1
-                when @@instruction_type[:decrease]
+                when :decrease
                     registers[instruction.param1] -= 1
-                when @@instruction_type[:jump]
+                when :jump
                     # If source register value is not zero
                     if (registers[instruction.param1] || instruction.param1) != 0
                         idx += (registers[instruction.param2] || instruction.param2)

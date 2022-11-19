@@ -11,7 +11,8 @@ class Solution
         code = ""
         @lines.each do |line|
             line.split("").each do |c|
-                number = @@next_keypad_number_map[c].call(number)
+                key = @@key[c]
+                number = @@next_keypad_number_map[key].call(number)
             end
             code += number.to_s
         end
@@ -26,7 +27,8 @@ class Solution
         code = ""
         @lines.each do |line|
             line.split("").each do |c|
-                number = @@next_hex_keypad_number_map[c].call(number)
+                key = @@key[c]
+                number = @@next_hex_keypad_number_map[key].call(number)
             end
             code += number.to_s(16).upcase # Converting to hexadecimal representation
         end
@@ -38,19 +40,19 @@ class Solution
 
     ###################################
 
-    @@key = { up: "U", right: "R", down: "D", left: "L" }
+    @@key = { "U" => :up, "R" => :right, "D" => :down, "L" => :left }
 
     # Normal keypad 1-9
     @@next_keypad_number_map = {
-        @@key[:up] => lambda { |n| n < 4 ? n : n - 3 },
-        @@key[:down] => lambda { |n| n > 6 ? n : n + 3 },
-        @@key[:left] => lambda { |n| [1, 4, 7].include?(n) ? n : n - 1 },
-        @@key[:right] => lambda { |n| [3, 6, 9].include?(n) ? n : n + 1 }
+        :up => lambda { |n| n < 4 ? n : n - 3 },
+        :down => lambda { |n| n > 6 ? n : n + 3 },
+        :left => lambda { |n| [1, 4, 7].include?(n) ? n : n - 1 },
+        :right => lambda { |n| [3, 6, 9].include?(n) ? n : n + 1 }
     }
 
     # Custom hexadecimal keypad 1-D
     @@next_hex_keypad_number_map = {
-        @@key[:up] => lambda { |n|
+        :up => lambda { |n|
             case n.to_s(16).upcase
                 when /[52149]/
                     n
@@ -60,7 +62,7 @@ class Solution
                     n - 4
             end
         },
-        @@key[:down] => lambda { |n|
+        :down => lambda { |n|
             case n.to_s(16).upcase
                 when /[5ADC9]/
                     n
@@ -70,8 +72,8 @@ class Solution
                     n + 4
             end
         },
-        @@key[:left] => lambda { |n| n.to_s(16).upcase =~ /[125AD]/ ? n : n - 1 },
-        @@key[:right] => lambda { |n| n.to_s(16).upcase =~ /[149CD]/ ? n : n + 1 }
+        :left => lambda { |n| n.to_s(16).upcase =~ /[125AD]/ ? n : n - 1 },
+        :right => lambda { |n| n.to_s(16).upcase =~ /[149CD]/ ? n : n + 1 }
     }
 
 end

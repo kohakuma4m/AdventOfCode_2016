@@ -39,25 +39,26 @@ class Solution
         end
     }
 
-    @@instruction_type = { copy: "cpy", increase: "inc", decrease: "dec", jump: "jnz", toggle: "tgl" }
+    @@instruction_type = { "cpy" => :copy, "inc" => :increase, "dec" => :decrease, "jnz" => :jump, "tgl" => :toggle }
 
     def read_instructions(lines)
         return lines.map { |line|
             name, param1, param2 = line.split(" ")
+            type = @@instruction_type[name]
 
-            case name
-                when @@instruction_type[:copy]
+            case type
+                when :copy
                     value = param1.match(/[a-z]/) ? param1 : Integer(param1)
-                    Instruction.new(name, value, param2) # param1 is a register or a number, param2 is a register
-                when @@instruction_type[:increase], @@instruction_type[:decrease]
-                    Instruction.new(name, param1) # param1 is a register, param2 is undefined
-                when @@instruction_type[:jump]
+                    Instruction.new(type, value, param2) # param1 is a register or a number, param2 is a register
+                when :increase, :decrease
+                    Instruction.new(type, param1) # param1 is a register, param2 is undefined
+                when :jump
                     value1 = param1.match(/[a-z]/) ? param1 : Integer(param1)
                     value2 = param2.match(/[a-z]/) ? param2 : Integer(param2)
-                    Instruction.new(name, value1, value2) # param1 and param2 can both be a register or a number
-                when @@instruction_type[:toggle]
+                    Instruction.new(type, value1, value2) # param1 and param2 can both be a register or a number
+                when :toggle
                     value = param1.match(/[a-z]/) ? param1 : Integer(param1)
-                    Instruction.new(name, value) # param1 is a register or a number, param2 is undefined
+                    Instruction.new(type, value) # param1 is a register or a number, param2 is undefined
             end
         }
     end
@@ -79,20 +80,20 @@ class Solution
             instruction = instructions[idx]
 
             case instruction.type
-                when @@instruction_type[:copy]
+                when :copy
                     # Copy value from source register or initial value
                     registers[instruction.param2] = registers[instruction.param1] || instruction.param1 if registers[instruction.param2]
-                when @@instruction_type[:increase]
+                when :increase
                     registers[instruction.param1] += 1 if registers[instruction.param1]
-                when @@instruction_type[:decrease]
+                when :decrease
                     registers[instruction.param1] -= 1 if registers[instruction.param1]
-                when @@instruction_type[:jump]
+                when :jump
                     # If source register value is not zero
                     if (registers[instruction.param1] || instruction.param1) != 0
                         idx += (registers[instruction.param2] || instruction.param2)
                         next
                     end
-                when @@instruction_type[:toggle]
+                when :toggle
                     instruction_idx = idx + (registers[instruction.param1] || instruction.param1)
                     # If affected instruction is inside program
                     if instruction_idx >= 0 && instruction_idx < instructions.length
@@ -111,15 +112,15 @@ class Solution
     def toggle_instruction(instruction)
         case instruction&.type
             # One param instructions
-            when @@instruction_type[:increase]
-                instruction.type = @@instruction_type[:decrease]
-            when @@instruction_type[:decrease], @@instruction_type[:toggle]
-                instruction.type = @@instruction_type[:increase]
+            when :increase
+                instruction.type = :decrease
+            when :decrease, :toggle
+                instruction.type = :increase
             # Two param instructions
-            when @@instruction_type[:copy]
-                instruction.type = @@instruction_type[:jump]
-            when @@instruction_type[:jump]
-                instruction.type = @@instruction_type[:copy]
+            when :copy
+                instruction.type = :jump
+            when :jump
+                instruction.type = :copy
         end
     end
 
@@ -163,7 +164,7 @@ class Solution
             puts "#{instruction_idx} --> #{registers}"
 
             registers["c"] = -16 # L18 --> returning to L3 from L19 unless...
-            break if instructions[18].type != @@instruction_type[:jump] # L19 is now a copy instruction instead of jump
+            break if instructions[18].type != :jump # L19 is now a copy instruction instead of jump
         end
 
         ##
@@ -193,7 +194,7 @@ class Solution
             puts "#{instruction_idx} --> #{registers}"
 
             registers["c"] = -16 # L18
-            break if instructions[18].type != @@instruction_type[:jump] # L19 (jump)
+            break if instructions[18].type != :jump # L19 (jump)
         end
 
         ##
@@ -202,7 +203,7 @@ class Solution
         # note: initial value for "a" must be greater than 5 to not have an infinite loop in original version...
         #       ...the optimized decompiled code below would not give an error, but it would give a different result, so we raise an exception instead
         ##
-        raise ArgumentError.new("Invalid initial value for register a") if instructions[24].type != @@instruction_type[:decrease]
+        raise ArgumentError.new("Invalid initial value for register a") if instructions[24].type != :decrease
 
         # L19 (copy), L20, L21 (copy), L22, L23 (dec), L24, L25 (dec), L26
         registers["a"] += 88 * 75
