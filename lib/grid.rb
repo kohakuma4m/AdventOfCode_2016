@@ -38,12 +38,12 @@ class Grid
     end
 
     # Methods
-    def print(horizontal_separator: "-", vertical_separator: "|")
+    def print(print_map: lambda { |x| x }, horizontal_separator: "-", vertical_separator: "|")
         border = horizontal_separator * (@width + 2)
 
         puts border
         @data.each do |row|
-            puts "#{vertical_separator.ljust(horizontal_separator.length)}#{row.join("")}#{vertical_separator.rjust(horizontal_separator.length)}"
+            puts "#{vertical_separator.ljust(horizontal_separator.length)}#{row.map(&print_map).join("")}#{vertical_separator.rjust(horizontal_separator.length)}"
         end
         puts border
     end

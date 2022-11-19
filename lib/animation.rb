@@ -10,7 +10,7 @@ class Animation
     end
 
     # Methods
-    def play(frame_per_second: 60)
+    def play(print_map: lambda { |x| x }, frame_per_second: 60)
         refresh_delay = 1.0 / frame_per_second
 
         i = 0
@@ -22,7 +22,7 @@ class Animation
             frame = Grid.new(@width, @height)
             @height.times { |y|
                 @width.times { |x|
-                    frame.data[y][x] = @frames[i][y][x]
+                    frame.data[y][x] = print_map.call(@frames[i][y][x])
                 }
             }
             frame.print(horizontal_separator: " ", vertical_separator: " ")
