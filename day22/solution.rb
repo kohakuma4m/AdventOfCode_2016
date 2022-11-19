@@ -93,7 +93,7 @@ class Solution
         # Finding closest empty node from target on path to goal
         nb_target_steps = 0
         path_empty_to_target = data_grid.empty_nodes
-            .map { |e| data_grid.find_shortest_path(e, path_target_to_goal.nodes[nb_target_steps + 1], wall_node: data_grid.target) } # Excluding current target
+            .map { |e| data_grid.find_shortest_path(e, path_target_to_goal.nodes[nb_target_steps + 1], occupied_node: data_grid.target) } # Excluding current target
             .sort_by { |p| p.nodes.length }.first # Keeping only path from shortest node
 
         # Initial clean frame
@@ -121,7 +121,7 @@ class Solution
             end
 
             # Moving empty node to next step on path from target to goal
-            path_empty_to_target = data_grid.find_shortest_path(empty_node, path_target_to_goal.nodes[nb_target_steps + 1], wall_node: current_target) # Excluding current target
+            path_empty_to_target = data_grid.find_shortest_path(empty_node, path_target_to_goal.nodes[nb_target_steps + 1], occupied_node: current_target) # Excluding current target
             empty_node = _move_empty_node(path_empty_to_target, frames, empty_node)
         end
 
@@ -233,6 +233,11 @@ class Solution
         end
 
         # O(1) operation because of nodes map
+        def get_node(location)
+            return @nodes_map["#{location.x}-#{location.y}"]
+        end
+
+        # O(1) operation because of nodes map
         def get_adjacent_nodes(node)
             return [
                 @nodes_map["#{node.x - 1}-#{node.y}"],
@@ -245,7 +250,7 @@ class Solution
         ##
         #   Returns shortest path between two nodes in data grid (see day 13)
         ##
-        def find_shortest_path(start_node, end_node, wall_node: nil)
+        def find_shortest_path(start_node, end_node, occupied_node: nil)
             explored_nodes = Set.new([start_node])
             paths_to_explore = [Path.new([start_node])]
 
@@ -254,10 +259,11 @@ class Solution
                 paths_to_explore = []
 
                 paths.each do |p|
-                    current_node = p.nodes[-1]
+                    current_node = self.get_node(p.nodes[-1])
                     self.get_adjacent_nodes(current_node)
                         .select { |n| !@full_nodes.include?(n) } # Excluding full nodes which act as walls
-                        .select { |n| !wall_node || wall_node.key != n.key } # Excluding specific extra node, counted as a wall so path does not goes through it
+                        .select { |n| n.used <= current_node.size && n.size >= current_node.used } # Excluding nodes which have too much data for current node data (or vice-versa in case we want to follow path in reverse)
+                        .select { |n| !occupied_node || occupied_node.key != n.key } # Excluding specific extra node, counted as a wall so path does not goes through it
                         .each { |n|
                             if explored_nodes.add?(n)
                                 new_path = Path.new(p.nodes + [n])
