@@ -71,13 +71,11 @@ class Solution
         nb_instructions = 0
         until idx < 0 || idx >= instructions.length
             instruction = instructions[idx]
-
             nb_instructions += 1
+
             if nb_instructions % 10000 == 0
                 puts "#{nb_instructions} --> #{registers}"
             end
-
-            instruction = instructions[idx]
 
             case instruction.type
                 when :copy
