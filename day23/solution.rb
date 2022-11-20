@@ -1,21 +1,24 @@
+require_relative "../lib/assembunny"
+
 class Solution
 
     def initialize(data = "")
-        @instructions = read_instructions(data.split("\n"))
+        @program_data = data
     end
 
     def solution1
-        registers = run_assembunny(@instructions, registers: { "a" => 7, "b" => 0, "c" => 0, "d" => 0 })
+        program = Assembunny.new(@program_data, initial_state: { a: 7 })
+        program.run
 
         puts "========================"
-        puts registers
+        puts program.state.registers
         puts "========================"
-        puts "Solution #1: #{registers["a"]}"
+        puts "Solution #1: #{program.state.registers[:a]}"
         puts "========================"
     end
 
     def solution2
-        #registers = run_decompiled_assembunny(@instructions, registers: { "a" => 12, "b" => 0, "c" => 0, "d" => 0 })
+        @instructions = Assembunny.read_instructions(@program_data)
         registers = run_optimized_assembunny(@instructions, registers: { "a" => 12, "b" => 0, "c" => 0, "d" => 0 })
 
         puts "========================"
@@ -33,37 +36,7 @@ class Solution
 
     ###################################
 
-    Instruction = Struct.new(:type, :param1, :param2) {
-        def to_s
-            "#{type}: #{param1}, #{param2}"
-        end
-    }
-
-    @@instruction_type = { "cpy" => :copy, "inc" => :increase, "dec" => :decrease, "jnz" => :jump, "tgl" => :toggle }
-
-    def read_instructions(lines)
-        return lines.map { |line|
-            name, param1, param2 = line.split(" ")
-            type = @@instruction_type[name]
-
-            case type
-                when :copy
-                    value = param1.match(/[a-z]/) ? param1 : Integer(param1)
-                    Instruction.new(type, value, param2) # param1 is a register or a number, param2 is a register
-                when :increase, :decrease
-                    Instruction.new(type, param1) # param1 is a register, param2 is undefined
-                when :jump
-                    value1 = param1.match(/[a-z]/) ? param1 : Integer(param1)
-                    value2 = param2.match(/[a-z]/) ? param2 : Integer(param2)
-                    Instruction.new(type, value1, value2) # param1 and param2 can both be a register or a number
-                when :toggle
-                    value = param1.match(/[a-z]/) ? param1 : Integer(param1)
-                    Instruction.new(type, value) # param1 is a register or a number, param2 is undefined
-            end
-        }
-    end
-
-    # Original compiled program
+    # Original compiled version
     def run_assembunny(instructions, start_idx: 0, registers: { "a" => 0, "b" => 0, "c" => 0, "d" => 0 })
         puts "\nRunning..."
 
@@ -95,7 +68,7 @@ class Solution
                     instruction_idx = idx + (registers[instruction.param1] || instruction.param1)
                     # If affected instruction is inside program
                     if instruction_idx >= 0 && instruction_idx < instructions.length
-                        toggle_instruction(instructions[instruction_idx])
+                        Assembunny.toggle_instruction(instructions[instruction_idx])
                     end
             end
 
@@ -107,22 +80,7 @@ class Solution
         return registers
     end
 
-    def toggle_instruction(instruction)
-        case instruction&.type
-            # One param instructions
-            when :increase
-                instruction.type = :decrease
-            when :decrease, :toggle
-                instruction.type = :increase
-            # Two param instructions
-            when :copy
-                instruction.type = :jump
-            when :jump
-                instruction.type = :copy
-        end
-    end
-
-    # Partially decompiled version to analyzed what the code is doing...
+    # Partially decompiled original version to analyzed what the code is doing...
     def run_decompiled_assembunny(instructions, registers: { "a" => 0, "b" => 0, "c" => 0, "d" => 0 })
         registers["b"] = registers["a"] # L1
         registers["b"] -= 1 # L2
@@ -157,7 +115,7 @@ class Solution
             # L17 (Toggle instruction)
             instruction_idx = 16 + registers["c"] # c is always positive by this point...
             if instruction_idx < 26 # L27 which does not exists
-                toggle_instruction(instructions[instruction_idx])
+                Assembunny.toggle_instruction(instructions[instruction_idx])
             end
             puts "#{instruction_idx} --> #{registers}"
 
@@ -172,7 +130,7 @@ class Solution
         return run_assembunny(instructions, start_idx: 18, registers: registers) # Continuing from current line L19
     end
 
-    # Optimized faster version of the above program, fully decompiled with addition loops converted to single multiplication operation
+    # Fully decompiled and optimized version with addition loops converted to single multiplication operation
     def run_optimized_assembunny(instructions, registers: { "a" => 0, "b" => 0, "c" => 0, "d" => 0 })
         registers["b"] = registers["a"] # L1
         registers["b"] -= 1 # L2
@@ -187,7 +145,7 @@ class Solution
             # L17 (Toggle instruction: can only toggle odd numbered lines L25 --> L23 --> L21 --> L19 in decreasing order since c is always a multiple of 2)
             instruction_idx = 16 + registers["c"] # c is always positive by this point...
             if instruction_idx < 26 # L27 which does not exists
-                toggle_instruction(instructions[instruction_idx])
+                Assembunny.toggle_instruction(instructions[instruction_idx])
             end
             puts "#{instruction_idx} --> #{registers}"
 
